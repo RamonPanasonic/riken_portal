@@ -1,0 +1,192 @@
+{% extends "layouts/base.html" %}
+
+{% block title %} Facturas de proveedores{% endblock %}
+
+<!-- Element injected in the BODY element -->
+{% block body_class %} {% endblock body_class %}
+
+<!-- Specific Page CSS goes HERE  -->
+{% block stylesheets %}
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+
+  <!-- Google Font: Source Sans Pro -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="/static/assets/plugins/fontawesome-free/css/all.min.css">
+  <!-- DataTables -->
+  <link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  <!-- Theme style -->
+  <link rel="stylesheet" href="/static/assets/css/adminlte.min.css">
+  <!-- Toastr -->
+  <link rel="stylesheet" href="/static/assets/plugins/toastr/toastr.min.css">
+<style>
+
+    #datatable_list td:nth-child(3),
+    #datatable_list th:nth-child(3) {
+        white-space: nowrap; /* Evita el salto de línea */
+        text-align: right; /* Alinea el contenido a la derecha */
+        width: 1%; /* Ajuste automático del ancho */
+    }
+
+</style>
+
+{% endblock stylesheets %}
+
+{% block content %}
+
+  <!-- Content Wrapper. Contains page content -->
+  <div style="background-color: lightgrey; height: 60vh; overflow-y: auto;">
+
+        <!-- Contenedor de Cargando (Oculto por defecto) -->
+        <div id="loadingMessage" style="display:none; text-align: center; margin-top: 20px;">
+            <i class="fas fa-spinner fa-spin" style="font-size: 3rem;"></i>
+            <p>Cargando...</p>
+        </div>
+
+            <!-- Main content -->
+            <section class="content">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="col-12">
+                    <div class="card">
+                      <div class="card-header">
+                        <h3 class="card-title">Facturas</h3>
+                      </div>
+                      <!-- /.card-header -->
+                      <div class="card-body" style="background-color: gainsboro;">
+                        <table id="datatable_list" class="table table-bordered table-striped" style="font-family: 'Avenir', sans-serif">
+                          <thead>
+                          <tr>
+                            <th>Factura</th>
+                            <th>Fecha de factura</th>
+                              <th>Total</th>
+                            <th>Divisa</th>
+                              <th>Estado de la factura</th>
+                            <th>Estado de pago</th>
+                            <th>Fecha estimada</th>
+
+
+                          </tr>
+                          </thead>
+                          <tbody>
+                          </tbody>
+                        </table>
+                      </div>
+                      <!-- /.card-body -->
+                    </div>
+                    <!-- /.card -->
+                  </div>
+                  <!-- /.col -->
+                </div>
+                <!-- /.row -->
+              </div>
+              <!-- /.container-fluid -->
+            </section>
+          <!-- Modal -->
+                <div class="modal fade" id="data_modal" tabindex="-1" role="dialog" aria-labelledby="data_modal"
+                     aria-hidden="true">
+                </div>
+            <!-- /.content -->
+  </div>
+
+{% endblock content %}
+<!-- Specific Page JS goes HERE  -->
+{% block javascripts %}
+  <!-- jQuery -->
+<script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+<!-- Bootstrap 4 -->
+<script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+<!-- DataTables -->
+<script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+<script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+<script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+
+  <!-- AdminLTE App -->
+  <script src="/static/assets/js/adminlte.min.js"></script>
+  <!-- AdminLTE for demo purposes -->
+  <script src="/static/assets/js/demo.js"></script>
+  <!-- Axios -->
+  <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+  <!-- Toastr -->
+  <script src="/static/assets/plugins/toastr/toastr.min.js"></script>
+  <!-- page script -->
+  <script>
+  $(function() {
+    get_data('/portal_proveedores/get');
+});
+
+function get_data(url) {
+    // Mostrar el mensaje de carga
+    $("#loadingMessage").show();
+
+    // Realizar la llamada a la API para obtener los datos
+    $.getJSON(url, function (data) {
+        update_table(data.data);
+        $("#loadingMessage").hide();
+    });
+}
+
+function update_table(data) {
+    let expense_concepts = [];
+    $.each(data, function (i, element) {
+        let expense_concept = [];
+        expense_concept.push(element.name);
+        expense_concept.push(element.invoice_date);
+        expense_concept.push('$ ' + element.amount_total.toLocaleString("es-MX", { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+        expense_concept.push(element.currency_id[1]);
+        expense_concept.push(element.x_studio_estado_de_la_factura)
+        expense_concept.push(element.x_studio_estado_de_pago)
+        if(element.x_studio_fecha_de_pago){
+            expense_concept.push(element.x_studio_fecha_de_pago);
+        }else{
+            expense_concept.push('')
+        }
+        expense_concepts.push(expense_concept)
+    });
+
+    $('#datatable_list').DataTable().clear();
+    $('#datatable_list').DataTable().destroy();
+    $('#datatable_list').DataTable({
+    responsive: true,
+    language: {
+        url: 'https://cdn.datatables.net/plug-ins/1.13.4/i18n/es-ES.json',
+    },
+    data: expense_concepts,
+    autoWidth: false,  // Evita que DataTables fije el ancho automáticamente
+    columnDefs: [
+        { targets: 6, width: "1%" } // Ajusta el ancho de la columna Total
+    ],
+    columns: [
+        { title: "Factura" },
+        { title: "Fecha de factura" },
+        { title: "Total" },
+        { title: "Divisa" },
+        { title: "Estado de la factura" },
+        { title: "Estado de pago" },
+        { title: "Fecha estimada" },
+
+    ],
+    createdRow: function(row, data, dataIndex) {
+        $('td:eq(3)', row).css('text-align', 'right');
+    },
+    order: [[1, 'desc']]
+    });
+
+}
+
+// Función para formatear el número con separadores de miles y decimales
+function formatNumber(number) {
+    return new Intl.NumberFormat('es-ES', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+    }).format(number);
+}
+
+
+  </script>
+{% endblock javascripts %}
+

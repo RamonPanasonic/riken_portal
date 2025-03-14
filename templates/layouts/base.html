@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" href="/static/favicon.png" type="image/x-icon">
+  <link rel="canonical" href="https://appseed.us/adminlte"/>
+  <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+  <meta http-equiv="Pragma" content="no-cache" />
+  <meta http-equiv="Expires" content="0" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+  <title>
+    Riken - {% block title %}{% endblock %}
+  </title>
+
+  {% block stylesheets %}
+  <!-- Cargar DataTables CSS aquí -->
+  <link rel="stylesheet" href="/static/assets/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+  <link rel="stylesheet" href="/static/assets/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+  {% endblock stylesheets %}
+</head>
+
+<body style="background-color: dimgray; font-family: Arial, sans-serif">
+<nav class="navbar navbar-expand-lg navbar-dark justify-content-between" style="background-color: white; height: auto;">
+    <img src="/static/logo.jpg" style="height: 60px">
+    <h5 style="color: black; margin-left: 15px">Portal de proveedores</h5>
+  <div class="container-fluid justify-content-end" style="font-size: 15px;">
+        <ul class="navbar-nav" style="width: 300px;">
+      <li class="nav-item">
+        <a href="/logout" class="nav-link" style="color: black;">
+          <i class="fa-solid fa-user-circle nav-icon"></i>
+          {{ current_user.name }} <br><small class="d-none d-md-inline">Log Out</small>
+        </a>
+      </li>
+    </ul>
+  </div>
+</nav>
+
+  <div class="container" style="margin-top: 50px">
+    {% include 'layouts/navbar.html' %}
+
+      {% block content %}{% endblock content %}
+
+  </div>
+
+  <!-- Cargar las librerías JS justo antes del cierre de la etiqueta body -->
+  <script src="/static/assets/plugins/jquery/jquery.min.js"></script>
+  <script src="/static/assets/plugins/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  <!-- Cargar DataTables JS -->
+  <script src="/static/assets/plugins/datatables/jquery.dataTables.min.js"></script>
+  <script src="/static/assets/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+  <script src="/static/assets/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+  <script src="/static/assets/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+  <!-- Tu script personalizado -->
+  {% block javascripts %}
+  {% endblock javascripts %}
+</body>
+</html>
