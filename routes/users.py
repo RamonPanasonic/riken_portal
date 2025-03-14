@@ -23,7 +23,6 @@ def changeinactive(id):
     Users.changeinactive(id)
     return make_response("Hecho")
 @users.route('/crud', methods=['POST'])
-@is_admin
 def users_crud():
     return addUser()
 
@@ -34,31 +33,23 @@ def users_list():
     return jsonify(users)
 
 @users.route('/all')
-@login_required
-@is_admin
 def users_index():
     model = Users.get_all()
     return render_template('home/users/list.html', users=model, current_user=current_user)
 
 @users.route('/add')
-@is_admin
-@login_required
 def users_add():
     return render_template('home/users/modal_add.html')
 
 @users.route('/<id>')
-@is_admin
-@login_required
 def find_user(id):
     user = Users.find_by_id(id)
     return render_template('home/users/modal_edit.html', user=user,role=Role, current_user=current_user)
 
 @users.route('/edit', methods=['POST'])
-@is_admin
 def users_edit():
     return editUsers()
 
 @users.route('/delete', methods=['POST'])
-@login_required
 def user_delete():
     return deleteUser()
